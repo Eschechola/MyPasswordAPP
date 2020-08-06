@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mypassword/blocs/navigation.bloc.dart';
 import 'package:mypassword/pages/welcome.page.dart';
 import 'package:mypassword/styles/app.colors.dart';
 
@@ -18,13 +18,9 @@ class _IndexState extends State with SingleTickerProviderStateMixin {
 
   void carregarHomePage(){
     Timer(Duration(seconds: 5), (){
-      Navigator.pushReplacement(context, new MaterialPageRoute(
-        builder: (BuildContext context) => new WelcomePage(),
-      ));
+      new NavigationBloc().pushReplacementTo(context, new WelcomePage());
     });
   } 
-
-
 
   void initState() {
     super.initState();
@@ -76,7 +72,7 @@ class _IndexState extends State with SingleTickerProviderStateMixin {
                     animation: rotationController,
                     child: Icon(
                       Icons.vpn_key,
-                      color: Colors.white,
+                      color: AppColors.secondaryColor,
                       size: 40,
                     ),
 

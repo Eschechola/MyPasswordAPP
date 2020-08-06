@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mypassword/blocs/navigation.bloc.dart';
+import 'package:mypassword/pages/login.page.dart';
+import 'package:mypassword/pages/register.page.dart';
 import 'package:mypassword/styles/app.colors.dart';
-import 'package:mypassword/widgets/button.widget.dart';
+import 'package:mypassword/widgets/mypassword.button.widget.dart';
 
 class WelcomePage extends StatelessWidget {
   @override
@@ -35,7 +38,7 @@ class WelcomePage extends StatelessWidget {
                           "Todas as suas senhas protegidas em qualquer lugar.",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: AppColors.secondaryColor,
+                            color: Color.fromRGBO(255, 255, 255, 0.8),
                             fontSize: MediaQuery.of(context).size.width * 0.06
                           ),
                         ),
@@ -59,12 +62,18 @@ class WelcomePage extends StatelessWidget {
 
                       MyPasswordButton(
                         text: "Login",
-                        function: (){},
+                        function: (){
+                          new NavigationBloc().pushTo(context, new LoginPage());
+                        },
+                        inverseButton: true,
                       ),
                       
                       MyPasswordButton(
                         text: "Cadastro",
-                        function: (){},
+                        function: (){
+                          new NavigationBloc().pushTo(context, new RegisterPage());
+                        },
+                        inverseButton: false,
                       )                      //Padding()
                     ],
                   ) ,
