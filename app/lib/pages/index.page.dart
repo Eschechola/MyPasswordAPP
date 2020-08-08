@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mypassword/blocs/navigation.bloc.dart';
@@ -16,9 +15,9 @@ class _IndexState extends State with SingleTickerProviderStateMixin {
 
   AnimationController rotationController;
 
-  void carregarHomePage(){
+  void pushHomePage(){
     Timer(Duration(seconds: 5), (){
-      new NavigationBloc().pushReplacementTo(context, new WelcomePage());
+      NavigationBloc().pushReplacementTo(context, new WelcomePage());
     });
   } 
 
@@ -39,7 +38,7 @@ class _IndexState extends State with SingleTickerProviderStateMixin {
       statusBarColor: AppColors.primaryColor, // status bar color
     ));
 
-    carregarHomePage();
+    pushHomePage();
   }
 
   @override

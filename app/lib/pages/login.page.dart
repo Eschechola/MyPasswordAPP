@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mypassword/blocs/navigation.bloc.dart';
-import 'package:mypassword/main.dart';
+import 'package:mypassword/pages/dashboard.page.dart';
 import 'package:mypassword/pages/register.page.dart';
 import 'package:mypassword/styles/app.colors.dart';
 import 'package:mypassword/widgets/mypassowrd.logo.widget.dart';
@@ -15,6 +14,14 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool remember = true;
+
+  void pushRegisterPage(){
+     NavigationBloc().pushReplacementTo(context, RegisterPage());
+  }
+
+  void pushDashboardPage(){
+     NavigationBloc().pushTo(context, DashboardPage());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +42,14 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: <Widget>[
                   MyPasswordInput(
-                    hintText: "Digite seu nome...",
+                    hintText: "Digite seu email...",
+                    keyboardType: TextInputType.text,
                   ),
 
                   MyPasswordInput(
-                    hintText: "Digite seu email...",
+                    hintText: "Digite sua senha...",
+                    keyboardType: TextInputType.text,
+                    isPassword: true,
                   ),
                   
                   CheckboxListTile(
@@ -79,9 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
 
                         InkWell(
-                          onTap: (){
-                            new NavigationBloc().pushReplacementTo(context, new RegisterPage());
-                          },
+                          onTap: pushRegisterPage,
                           child: Text(
                             "Cadastre-se",
                             style: TextStyle(
@@ -100,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: MyPasswordButton(
                       text: "Entrar",
-                      function: (){},
+                      function: pushDashboardPage,
                       inverseButton: false
                     )
                   )

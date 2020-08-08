@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mypassword/styles/app.colors.dart';
 
 class MyPasswordInput extends StatelessWidget {
-  var hintText = "";
+  String hintText = "";
+  TextInputType keyboardType;
+  bool isPassword = false;
 
-  MyPasswordInput({@required this.hintText});
+  MyPasswordInput({@required this.hintText, @required this.keyboardType, this.isPassword = false});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
         padding: EdgeInsets.only(top: 25, bottom: 25, left: 20, right: 20),
         child: TextField(
+          obscureText: isPassword,
+          keyboardType: keyboardType,
           style: TextStyle(color: Colors.white, fontSize: 20),
           decoration: new InputDecoration(
             contentPadding: EdgeInsets.only(

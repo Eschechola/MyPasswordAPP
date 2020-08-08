@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mypassword/blocs/navigation.bloc.dart';
 import 'package:mypassword/styles/app.colors.dart';
@@ -11,6 +10,11 @@ import 'login.page.dart';
 class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
+    void pushLoginPage(){
+      NavigationBloc().pushReplacementTo(context, LoginPage());
+    }
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -23,18 +27,24 @@ class RegisterPage extends StatelessWidget {
 
             MyPasswordInput(
               hintText: "Digite seu nome...",
+              keyboardType: TextInputType.text,
             ),
 
             MyPasswordInput(
               hintText: "Digite seu email...",
+              keyboardType: TextInputType.emailAddress,
             ),
 
             MyPasswordInput(
               hintText: "Digite sua senha...",
+              keyboardType: TextInputType.text,
+              isPassword: true,
             ),
 
             MyPasswordInput(
               hintText: "Digite novamente sua senha...",
+              keyboardType: TextInputType.text,
+              isPassword: true,
             ),
 
             Padding(
@@ -55,9 +65,7 @@ class RegisterPage extends StatelessWidget {
                   ),
 
                   InkWell(
-                    onTap: (){
-                      new NavigationBloc().pushReplacementTo(context, new LoginPage());
-                    },
+                    onTap: pushLoginPage,
                     child: Text(
                       "Entre aqui",
                       style: TextStyle(

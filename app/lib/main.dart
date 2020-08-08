@@ -11,7 +11,7 @@ class App extends StatelessWidget {
       title: 'MyPassword',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.purple,
+        primarySwatch: Colors.blue,
       ),
       home: IndexPage(),
     );
