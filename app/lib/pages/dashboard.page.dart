@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mypassword/blocs/navigation.bloc.dart';
 import 'package:mypassword/styles/app.colors.dart';
+import 'package:mypassword/widgets/mypassword.appBar.widget.dart';
+import 'package:mypassword/widgets/mypassword.bottomSheetMenu.widget.dart';
 import 'package:mypassword/widgets/mypassword.card.widget.dart';
+import 'package:mypassword/widgets/mypassword.homecard.widget.dart';
 import 'package:mypassword/widgets/mypassword.navmenu.dart';
+
+import 'managePassword.page.dart';
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -9,65 +15,111 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  void pushCreatePasswordPage(){
+     NavigationBloc().pushTo(context, ManagePasswordPage());
+  }
+
+  void callModalShowPassword(context, passwordId, passwordName, passwordValue){
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context){
+          return MyPassowrdBottomSheetMenu(
+            passwordId: passwordId,
+            passwordName: passwordName,
+            passwordValue: passwordValue,
+          );
+      }
+    );
+}
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: NavMenu(),
-      appBar: AppBar(
-        title: Text(
-          "MyPassword",
-        ),
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        centerTitle: true
+      appBar: MyPasswordAppBar(
+        title: "MyPassword"
       ),
       body: Container(
         decoration: BoxDecoration(
           color: AppColors.primaryColor
         ),
-        child: ListView(
+        child: Column(
           children: <Widget>[
-            MyPasswordCard(
-               child: Row(
-                 children: <Widget>[
-                   Padding(
-                     padding: EdgeInsets.only(
-                       left: 20,
-                       right: 20
-                     ),
-                     child: Container(
-                      width: 90,
-                      height: 90,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.thirdColor,
-                        borderRadius: BorderRadius.circular(80)
-                      ),
-                      child: Container(
-                        width: 87,
-                        height: 87,
-                        decoration: BoxDecoration(
-                          color: AppColors.cardColor,
-                          borderRadius: BorderRadius.circular(87)
-                        ),
-                      ), 
-                    ), 
-                   ),
+            MyPasswordHomeCard(
+              username: "usuário",
+            ),
+            
+            Padding(
+              padding: EdgeInsets.only(
+                top: 80,
+                left: 20,
+                right: 20,
+                bottom: 30
+              ),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  "Aqui estão suas senhas",
+                  style: TextStyle(
+                    color: AppColors.secondaryColor,
+                    fontSize: 20,     
+                  ),
+                ),
+              ), 
+            ),
+            
+            Container(
+              height: MediaQuery.of(context).size.height * 0.53,
+              child: 
+              Scrollbar(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(bottom: 15),
+                  itemCount: 10,
+                  itemBuilder: (BuildContext context, int index){
+                    return MyPasswordCard(
+                      onTap: () { 
+                        callModalShowPassword(context, 1, "Senha do email", "123");
+                      },
+                      height: 80,
+                      child: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Icon(
+                              Icons.lock_outline,
+                              color: AppColors.cardText,
+                              size: MediaQuery.of(context).size.height * 0.05,
+                            ), 
+                          ),
 
-                   Expanded(
-                      child: Text(
-                        "Olá usuário,\nseja bem - vindo!",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          color: AppColors.secondaryColor,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                 ],
-              )
-            )
+                          Padding(
+                            padding: EdgeInsets.only(
+                              top: 10
+                            ),
+                            child: Text(
+                              "Senha do email\n******",
+                              style: TextStyle(
+                                color: AppColors.cardText,
+                                fontSize: 20
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    );
+                  },
+                ),
+              ),
+            ), 
           ],
+        ),
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: pushCreatePasswordPage,//pushCreatePasswordPage,
+        backgroundColor: AppColors.thirdColor,
+        child: Icon(
+          Icons.add
         ),
       ),
     );
