@@ -16,17 +16,7 @@ namespace MyPasswordAPI.Infrastructure.Data.Context
         {
             
             builder.ApplyConfiguration(new PasswordMap());
-
             builder.ApplyConfiguration(new CustomerMap());
-
-            builder.Entity<Customer>()
-                .HasIndex(c => c.Email)
-                .IsUnique();
-
-            builder.Entity<Customer>()
-                .HasMany(p => p.Passwords)
-                .WithOne(c => c.Customer)
-                .IsRequired();
         }
     }
 }

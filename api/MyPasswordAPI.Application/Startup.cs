@@ -1,17 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using MyPasswordAPI.Domain.DTO;
+using MyPasswordAPI.Domain.Entities;
 using MyPasswordAPI.Infrastructure.Data.Context;
+using MyPasswordAPI.Infrastructure.Data.Interfaces;
+using MyPasswordAPI.Infrastructure.Data.Repositories;
+using MyPasswordAPI.Services.Interfaces;
+using MyPasswordAPI.Services.Services;
 
 namespace MyPasswordAPI.Application
 {
@@ -26,9 +28,60 @@ namespace MyPasswordAPI.Application
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            #region Services
 
-            services.AddDbContext<MyPasswordContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:SqlServer"]));
+            services.AddScoped<IPasswordService, PasswordService>();
+            services.AddScoped<ICustomerService, CustomerService>();
+
+            #endregion
+
+            #region Repositories
+
+            services.AddScoped<IPasswordRepository, PasswordRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+            #endregion
+
+            #region Databases
+
+            services.AddDbContext<MyPasswordContext>(options => 
+                options.UseSqlServer(Configuration["ConnectionStrings:SqlServer"]));
+
+            #endregion
+
+            #region AutoMapper
+
+            var autoMapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Password, PasswordDTO>().ReverseMap();
+                cfg.CreateMap<Customer, CustomerDTO>().ReverseMap();
+            });
+
+            services.AddSingleton(autoMapperConfig.CreateMapper());
+
+            #endregion
+
+            #region Swagger Config
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "MyPassword",
+                    Version = "v1",
+                    Description = "API do aplicativo MyPassword!",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "MyPasswordAPP Developers",
+                        Email = "lucas.eschechola@outlook.com",
+                        Url = new Uri("https://eschechola.com.br")
+                    },
+                });
+            });
+
+            #endregion
+
+            services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -37,6 +90,11 @@ namespace MyPasswordAPI.Application
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("../swagger/v1/swagger.json", "MyPasswordAPI v1.0");
+            });
 
             app.UseHttpsRedirection();
 

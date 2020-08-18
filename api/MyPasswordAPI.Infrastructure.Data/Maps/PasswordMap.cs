@@ -14,7 +14,7 @@ namespace MyPasswordAPI.Infrastructure.Data.Maps
             builder.Property(x => x.Id)
                 .UseIdentityColumn();
 
-            builder.Property(x => x.FkIdCustomer)
+            builder.Property(x => x.CustomerId)
                 .IsRequired()
                 .HasColumnType("int");
 

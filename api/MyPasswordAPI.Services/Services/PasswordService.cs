@@ -1,14 +1,21 @@
-﻿using MyPasswordAPI.Infrastructure.Data.Repositories;
+﻿using MyPasswordAPI.Domain.Entities;
+using MyPasswordAPI.Infrastructure.Data.Interfaces;
+using MyPasswordAPI.Services.Interfaces;
 
 namespace MyPasswordAPI.Services.Services
 {
-    public class PasswordService
+    public class PasswordService : IPasswordService
     {
-        private readonly PasswordRepository _passwordRepository;
+        private readonly IPasswordRepository _passwordRepository;
 
-        public PasswordService(PasswordRepository passwordRepository)
+        public PasswordService(IPasswordRepository passwordRepository)
         {
             _passwordRepository = passwordRepository;
+        }
+
+        public Password Insert(Password password)
+        {
+            return _passwordRepository.Insert(password);
         }
     }
 }

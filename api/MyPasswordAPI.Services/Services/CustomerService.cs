@@ -1,12 +1,13 @@
-﻿using MyPasswordAPI.Infrastructure.Data.Repositories;
+﻿using MyPasswordAPI.Infrastructure.Data.Interfaces;
+using MyPasswordAPI.Services.Interfaces;
 
 namespace MyPasswordAPI.Services.Services
 {
-    public class CustomerService
+    public class CustomerService : ICustomerService
     {
-        private readonly CustomerRepository _customerRepository;
+        private readonly ICustomerRepository _customerRepository;
 
-        public CustomerService(CustomerRepository customerRepository)
+        public CustomerService(ICustomerRepository customerRepository)
         {
             _customerRepository = customerRepository;
         }
