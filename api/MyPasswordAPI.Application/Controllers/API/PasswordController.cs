@@ -1,7 +1,9 @@
 ﻿using System;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using MyPasswordAPI.Application.Controllers.Base;
 using MyPasswordAPI.Application.ViewModels;
 using MyPasswordAPI.Domain.DTO;
 using MyPasswordAPI.Domain.Entities;
@@ -11,6 +13,8 @@ using MyPasswordAPI.Services.Interfaces;
 namespace MyPasswordAPI.Application.Controllers
 {
 
+    [Authorize]
+    [ApiController]
     [Route("/api/password")]
     public class PasswordController : BaseController
     {
@@ -29,6 +33,7 @@ namespace MyPasswordAPI.Application.Controllers
         }
 
         [HttpPost]
+        [Route("insert")]
         public IActionResult InsertPassword([FromBody]PasswordDTO passwordDTO)
         {
             try
@@ -51,9 +56,38 @@ namespace MyPasswordAPI.Application.Controllers
                 });
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return ErrorReturn;
+                return InternalServerError;
+            }
+        }
+
+        [HttpGet]
+        [Route("get-all/{userID}")]
+        public IActionResult GetAllCustomerPasswords(int userID = 0)
+        {
+            try
+            {
+                if (userID == 0)
+                    return BadRequest(new ResultViewModel
+                    {
+                        Message = "Insira um ID de usuário válido.",
+                        Success = false,
+                        Data = null
+                    });
+
+                var customerPasswords = _passwordService.GetAllFromCustomer(userID);
+
+                return Ok(new ResultViewModel
+                {
+                    Message = "Senhas encontradas com sucesso.",
+                    Success = true,
+                    Data = customerPasswords
+                });
+            }
+            catch (Exception)
+            {
+                return InternalServerError;
             }
         }
     }

@@ -1,21 +1,21 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MyPasswordAPI.Application.ViewModels;
 
-namespace MyPasswordAPI.Application.Controllers
+namespace MyPasswordAPI.Application.Controllers.Base
 {
-    [ApiController]
     public class BaseController : Controller
     {
         private readonly IConfiguration _configuration;
-        public readonly ObjectResult ErrorReturn;
+        public readonly ObjectResult InternalServerError;
 
         public BaseController(IConfiguration configuration)
         {
             _configuration = configuration;
             
-            ErrorReturn = StatusCode(
+            InternalServerError = StatusCode(
                 StatusCodes.Status500InternalServerError, new ResultViewModel
                 {
                     Message = _configuration["ErrorObject:Message"],

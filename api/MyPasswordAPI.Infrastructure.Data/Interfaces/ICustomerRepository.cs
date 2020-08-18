@@ -3,5 +3,7 @@
 namespace MyPasswordAPI.Infrastructure.Data.Interfaces
 {
     public interface ICustomerRepository : IBaseRepository<Customer>
-    {}
+    {
+        Customer GetByEmail(string email);
+    }
 }
