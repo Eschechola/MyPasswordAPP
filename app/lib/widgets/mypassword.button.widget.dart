@@ -4,9 +4,11 @@ import 'package:mypassword/styles/app.colors.dart';
 class MyPasswordButton extends StatelessWidget {
   var text = "";
   var inverseButton = false;
+  var iconButton = false;
+  Widget iconWidget;
   Function function;
 
-  MyPasswordButton({@required this.text, @required this.function, @required this.inverseButton});
+  MyPasswordButton({@required this.text, @required this.function, @required this.inverseButton, this.iconButton = false, this.iconWidget });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,9 @@ class MyPasswordButton extends StatelessWidget {
                 style: BorderStyle.solid,
               )
             ),
-            child: Text(text,
+            child: iconButton ?
+            iconWidget
+            : Text(text,
                 style: TextStyle(
                     color: AppColors.secondaryColor,
                     fontSize: 20,

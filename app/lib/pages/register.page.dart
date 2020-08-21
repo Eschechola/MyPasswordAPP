@@ -1,20 +1,159 @@
 import 'package:flutter/material.dart';
-import 'package:mypassword/blocs/navigation.bloc.dart';
+import 'package:mypassword/blocs/bloc/customer.bloc.dart';
+import 'package:mypassword/blocs/bloc/navigation.service.dart';
+import 'package:mypassword/models/enums/inputType.enum.dart';
+import 'package:mypassword/models/validators/errorsValidation.model.dart';
+import 'package:mypassword/models/entities/customer.model.dart';
+import 'package:mypassword/models/enums/customerType.enum.dart';
+import 'package:mypassword/models/validators/customer.validator.dart';
+import 'package:mypassword/pages/dashboard.page.dart';
+import 'package:mypassword/settings/settings.dart';
 import 'package:mypassword/styles/app.colors.dart';
 import 'package:mypassword/widgets/mypassowrd.logo.widget.dart';
 import 'package:mypassword/widgets/mypassword.button.widget.dart';
 import 'package:mypassword/widgets/mypassword.input.widget.dart';
+import 'package:mypassword/widgets/mypassword.toast.widget.dart';
 
 import 'login.page.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
+  _RegisterPageState createState() => _RegisterPageState();
+}
 
-    void pushLoginPage(){
+class _RegisterPageState extends State<RegisterPage> {
+  bool isLoading = false;
+
+  final nameController = TextEditingController();
+   List<ErrorsValidation> nameErrors = new List<ErrorsValidation>();
+
+  final emailController = TextEditingController();
+  List<ErrorsValidation> emailErrors = new List<ErrorsValidation>();
+
+  final passwordController = TextEditingController();
+  List<ErrorsValidation> passwordErrors = new List<ErrorsValidation>();
+
+  final confirmPasswordController = TextEditingController();
+  List<ErrorsValidation> confirmPasswordErrors = new List<ErrorsValidation>();
+
+  void pushLoginPage(){
       NavigationBloc().pushReplacementTo(context, LoginPage());
+  }
+
+  void pushDashboardPage(){
+      NavigationBloc().pushReplacementTo(context, DashboardPage());
+  }
+
+  void cleanAllErrors(){
+    nameErrors.clear();
+    emailErrors.clear();
+    passwordErrors.clear();
+    confirmPasswordErrors.clear();
+  }
+
+
+  void clearErrors(InputType inputType){
+    setState(() {
+        switch(inputType){
+          case InputType.name:
+            nameErrors.clear();
+          break;
+
+          case InputType.email:
+            emailErrors.clear();
+          break;
+
+          case InputType.password:
+            passwordErrors.clear();
+          break;
+
+          case InputType.confirmPassword:
+            confirmPasswordErrors.clear();
+          break;
+      }
+    });
+  }
+
+  void addError(ErrorsValidation error){
+    setState(() {
+      switch(error.inputType){
+        case InputType.name:
+          nameErrors.add(error);
+        break;
+
+        case InputType.email:
+          emailErrors.add(error);
+        break;
+
+        case InputType.password:
+          passwordErrors.add(error);   
+        break;
+
+        case InputType.confirmPassword:
+          confirmPasswordErrors.add(error);
+        break;
+      }
+    });
+  }
+
+  void registerCustomer() async {
+    try{
+        setState(() {
+          //ativa o loading indicator
+          isLoading = true;
+        });
+            
+        //entidade do usuário
+        var customer = new Customer(
+            name: nameController.text.trimRight().trimLeft(),
+            email: emailController.text.trimRight().trimLeft(),
+            password: passwordController.text,
+            type: CustomerType.normal,
+            confirmPassword: confirmPasswordController.text
+          );
+
+          //valida os dados do cliente
+          var validator = new CustomerValidator();
+          validator.validate(customer);
+
+          setState(() {
+            if(validator.errors.length > 0){
+              for(var error in validator.errors){
+                addError(error);    
+              }
+
+              //desativa o loading
+              isLoading = false;
+
+              MyPasswordToast.showToast(Settings.INVALID_INPUTS_MESSAGE, context);
+            }
+            else{
+              new CustomerBloc().registerCustomer(customer).then((result) => {
+                  //limpa os erros
+                  cleanAllErrors(),
+                  
+                  //caso tenha registrado com sucesso, chama a homepage
+                  if(result.success){
+                    pushDashboardPage()
+                  }
+                  else{
+                    MyPasswordToast.showToast(result.message, context)
+                  }
+                    
+              });
+            }
+
+            isLoading = false;
+          });
+        }
+        catch(ex){
+          MyPasswordToast.showToast(ex.toString(), context);
+        }
     }
 
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -26,32 +165,52 @@ class RegisterPage extends StatelessWidget {
             MyPasswordLogo(),
 
             MyPasswordInput(
+              controller: nameController,
               hintText: "Digite seu nome...",
               keyboardType: TextInputType.text,
+              errors: nameErrors,
+              onChanged: (String arg){
+                clearErrors(InputType.name);
+              }
             ),
 
             MyPasswordInput(
+              controller: emailController,
               hintText: "Digite seu email...",
               keyboardType: TextInputType.emailAddress,
+              errors: emailErrors,
+              onChanged: (String arg){
+                clearErrors(InputType.email);
+              }
             ),
 
             MyPasswordInput(
+              controller: passwordController,
               hintText: "Digite sua senha...",
               keyboardType: TextInputType.text,
               isPassword: true,
+              errors: passwordErrors,
+              onChanged: (String arg){
+                clearErrors(InputType.password);
+              }
             ),
 
             MyPasswordInput(
+              controller: confirmPasswordController,
               hintText: "Digite novamente sua senha...",
               keyboardType: TextInputType.text,
               isPassword: true,
+              errors: confirmPasswordErrors,
+              onChanged: (String arg){
+                clearErrors(InputType.confirmPassword);
+              }
             ),
 
             Padding(
               padding: EdgeInsets.only(
                 top: 15,
                 left: 28,
-                bottom: 50
+                bottom: 15
               ),
               
               child: Row(
@@ -78,9 +237,19 @@ class RegisterPage extends StatelessWidget {
               ),
             ),
 
+            isLoading ? 
             MyPasswordButton(
+              text: '',
               inverseButton: false,
+              iconButton: true,
+              iconWidget: CircularProgressIndicator(
+                backgroundColor: AppColors.secondaryColor,
+              ),
               function: (){},
+            )
+            : MyPasswordButton(
+              inverseButton: false,
+              function: registerCustomer,
               text: "Cadastre - se",
             ),
           ],

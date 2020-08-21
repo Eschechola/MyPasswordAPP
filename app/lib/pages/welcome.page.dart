@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mypassword/blocs/navigation.bloc.dart';
+import 'package:mypassword/blocs/bloc/navigation.service.dart';
 import 'package:mypassword/pages/login.page.dart';
 import 'package:mypassword/pages/register.page.dart';
 import 'package:mypassword/styles/app.colors.dart';

@@ -1,6 +1,5 @@
 ﻿using System;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MyPasswordAPI.Application.Controllers.Base;
@@ -12,7 +11,6 @@ using MyPasswordAPI.Services.Interfaces;
 
 namespace MyPasswordAPI.Application.Controllers.API
 {
-    [Authorize]
     [ApiController]
     [Route("/api/customer")]
     public class CustomerController : BaseController
@@ -44,6 +42,11 @@ namespace MyPasswordAPI.Application.Controllers.API
 
                 if (entityErrors.Errors.Count > 0)
                     return BadRequest(new ResultViewModel("Corrija os campos inválidos e tente novamente.", false, entityErrors.Errors));
+
+                var customerExists = _customerService.GetByEmail(customer.Email);
+
+                if (customerExists != null)
+                    return BadRequest(new ResultViewModel("O email está associado a outra conta.", false, null));
 
                 var customerInserted = _customerService.Insert(customer);
 

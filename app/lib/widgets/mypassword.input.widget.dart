@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:mypassword/models/validators/errorsValidation.model.dart';
 import 'package:mypassword/styles/app.colors.dart';
 
 class MyPasswordInput extends StatelessWidget {
+  TextEditingController controller;
   String hintText = "";
   TextInputType keyboardType;
   bool isPassword = false;
+  List<ErrorsValidation> errors;
+  Function onChanged = (String arg){};
 
-  MyPasswordInput({@required this.hintText, @required this.keyboardType, this.isPassword = false});
+  MyPasswordInput({@required this.hintText, @required this.keyboardType, this.controller, this.isPassword = false, this.errors, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(top: 25, bottom: 25, left: 20, right: 20),
+    return Column(
+      children: <Widget>[
+        Padding(
+        padding: EdgeInsets.only(top: 10, left: 20, right: 20),
         child: TextField(
+          onChanged: onChanged,
+          controller: controller,
           obscureText: isPassword,
           keyboardType: keyboardType,
           style: TextStyle(color: Colors.white, fontSize: 20),
@@ -36,6 +43,34 @@ class MyPasswordInput extends StatelessWidget {
               fontSize: 18,
             ),
           ),
-        ));
+        )),
+
+        Padding(
+          padding: EdgeInsets.only(
+            top: 15,
+            bottom: 15,
+            left: 30,
+            right: 20
+          ),
+          child: 
+          this.errors != null && this.errors.length > 0 
+          ? Container(
+            width: MediaQuery.of(context).size.width,
+            child:
+              Text(
+              this.errors[0].error,
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: AppColors.errorColor,
+                fontSize: 17
+              ),
+            )
+          )
+          : Padding(
+            padding: EdgeInsets.all(10)
+          )
+        )
+      ],
+    ); 
   }
 }

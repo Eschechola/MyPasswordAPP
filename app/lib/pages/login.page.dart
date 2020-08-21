@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mypassword/blocs/navigation.bloc.dart';
+import 'package:mypassword/blocs/bloc/navigation.service.dart';
 import 'package:mypassword/pages/dashboard.page.dart';
 import 'package:mypassword/pages/register.page.dart';
 import 'package:mypassword/styles/app.colors.dart';
@@ -104,12 +104,12 @@ class _LoginPageState extends State<LoginPage> {
 
                   Padding(
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height * 0.08
+                      top: MediaQuery.of(context).size.height * 0.03
                     ),
                     child: MyPasswordButton(
                       text: "Entrar",
                       function: pushDashboardPage,
-                      inverseButton: false
+                      inverseButton: false,
                     )
                   )
                 ],
