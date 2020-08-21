@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mypassword/blocs/bloc/navigation.service.dart';
+import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
 import 'package:mypassword/pages/welcome.page.dart';
 import 'package:mypassword/styles/app.colors.dart';
 

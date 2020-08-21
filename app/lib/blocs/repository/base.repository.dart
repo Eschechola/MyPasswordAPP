@@ -7,8 +7,8 @@ class BaseRepository{
     return openDatabase(
       join(await getDatabasesPath(), Settings.DATABASE_NAME),
       onCreate: (db, version) {
-        db.execute(Settings.CREATE_CUSTOMER_TABLE);
-        db.execute(Settings.CREATE_PASSWORD_TABLE);
+        db.execute(Settings.QUERY_CREATE_CUSTOMER_TABLE);
+        db.execute(Settings.QUERY_CREATE_PASSWORD_TABLE);
 
         return;
       },

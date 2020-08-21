@@ -11,7 +11,7 @@ class MyPasswordToast {
       gravity: Toast.TOP,
       backgroundColor: AppColors.thirdColor,
       textColor: AppColors.secondaryColor,
-      backgroundRadius: 2
+      backgroundRadius: 4
     );
   }
 }

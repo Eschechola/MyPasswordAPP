@@ -14,4 +14,9 @@ class NavigationBloc{
         builder: (BuildContext context) => widgetPage,
       ));
   }
+
+  void popAllAndReplace(BuildContext context, Widget widgetPage){
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+      builder: (context) => widgetPage), (Route<dynamic> route) => false);
+  }
 }

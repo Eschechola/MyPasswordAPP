@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mypassword/blocs/bloc/customer.bloc.dart';
-import 'package:mypassword/blocs/bloc/navigation.service.dart';
+import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
 import 'package:mypassword/models/enums/inputType.enum.dart';
 import 'package:mypassword/models/validators/errorsValidation.model.dart';
 import 'package:mypassword/models/entities/customer.model.dart';
@@ -41,7 +41,19 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void pushDashboardPage(){
-      NavigationBloc().pushReplacementTo(context, DashboardPage());
+      NavigationBloc().popAllAndReplace(context, DashboardPage());
+  }
+
+  void enableLoading(){
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+  void disableLoading(){
+    setState(() {
+      isLoading = false;
+    });
   }
 
   void cleanAllErrors(){
@@ -98,10 +110,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void registerCustomer() async {
     try{
-        setState(() {
-          //ativa o loading indicator
-          isLoading = true;
-        });
+        enableLoading();
             
         //entidade do usuário
         var customer = new Customer(
@@ -116,19 +125,16 @@ class _RegisterPageState extends State<RegisterPage> {
           var validator = new CustomerValidator();
           validator.validate(customer);
 
-          setState(() {
             if(validator.errors.length > 0){
               for(var error in validator.errors){
                 addError(error);    
               }
 
-              //desativa o loading
-              isLoading = false;
-
+              disableLoading();
               MyPasswordToast.showToast(Settings.INVALID_INPUTS_MESSAGE, context);
             }
             else{
-              new CustomerBloc().registerCustomer(customer).then((result) => {
+              await new CustomerBloc().registerCustomer(customer).then((result) => {
                   //limpa os erros
                   cleanAllErrors(),
                   
@@ -137,17 +143,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     pushDashboardPage()
                   }
                   else{
-                    MyPasswordToast.showToast(result.message, context)
+                    MyPasswordToast.showToast(result.message, context),
+                    disableLoading()
                   }
-                    
               });
             }
-
-            isLoading = false;
-          });
         }
         catch(ex){
           MyPasswordToast.showToast(ex.toString(), context);
+          disableLoading();
         }
     }
 

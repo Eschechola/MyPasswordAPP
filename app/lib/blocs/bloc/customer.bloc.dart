@@ -30,8 +30,7 @@ class CustomerBloc {
     //erro caso o cliente não seja inserido
     if(!responseModel.success)
       return new ResponseModel(message: responseModel.message, success: false, data: null);
-
-
+    
     //insere o usuário no banco de dados local
     await new CustomerRepository().registerCustomer(customer).then((response) => {
       if(!response)
