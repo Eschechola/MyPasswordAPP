@@ -9,7 +9,7 @@ namespace MyPasswordAPI.Application.Helpers
 {
     public static class TokenHelper
     {
-        public static string GenerateToken(Customer customer, string secretKey)
+        public static string GenerateToken(string name, string email, string secretKey)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -19,11 +19,11 @@ namespace MyPasswordAPI.Application.Helpers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, customer.Name),
-                    new Claim(ClaimTypes.Email, customer.Email),
+                    new Claim(ClaimTypes.Name, name),
+                    new Claim(ClaimTypes.Email, email),
                     new Claim(ClaimTypes.Role, "Customer")
                 }),
-                Expires = DateTime.UtcNow.AddHours(10),
+                Expires = DateTime.UtcNow.AddHours(24),
 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

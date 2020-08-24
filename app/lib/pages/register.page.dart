@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mypassword/blocs/bloc/customer.bloc.dart';
 import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
+import 'package:mypassword/models/entities/register.model.dart';
 import 'package:mypassword/models/enums/inputType.enum.dart';
 import 'package:mypassword/models/validators/errorsValidation.model.dart';
 import 'package:mypassword/models/entities/customer.model.dart';
 import 'package:mypassword/models/enums/customerType.enum.dart';
-import 'package:mypassword/models/validators/customer.validator.dart';
+import 'package:mypassword/models/validators/register.validator.dart';
 import 'package:mypassword/pages/dashboard.page.dart';
 import 'package:mypassword/settings/settings.dart';
 import 'package:mypassword/styles/app.colors.dart';
@@ -112,8 +113,8 @@ class _RegisterPageState extends State<RegisterPage> {
     try{
         enableLoading();
             
-        //entidade do usuário
-        var customer = new Customer(
+        //entidade de registro do usuário
+        var registerCustomer = new Register(
             name: nameController.text.trimRight().trimLeft(),
             email: emailController.text.trimRight().trimLeft(),
             password: passwordController.text,
@@ -122,8 +123,8 @@ class _RegisterPageState extends State<RegisterPage> {
           );
 
           //valida os dados do cliente
-          var validator = new CustomerValidator();
-          validator.validate(customer);
+          var validator = new RegisterValidator();
+          validator.validate(registerCustomer);
 
             if(validator.errors.length > 0){
               for(var error in validator.errors){
@@ -134,7 +135,15 @@ class _RegisterPageState extends State<RegisterPage> {
               MyPasswordToast.showToast(Settings.INVALID_INPUTS_MESSAGE, context);
             }
             else{
-              await new CustomerBloc().registerCustomer(customer).then((result) => {
+              //entidade do cliente já validada
+              var customer = new Customer(
+                email: registerCustomer.email,
+                name: registerCustomer.name,
+                password: registerCustomer.password,
+                type: registerCustomer.type 
+              );
+
+              await new CustomerBloc().insertCustomer(customer).then((result) => {
                   //limpa os erros
                   cleanAllErrors(),
                   

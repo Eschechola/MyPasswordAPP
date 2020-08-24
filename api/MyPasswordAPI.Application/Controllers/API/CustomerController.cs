@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MyPasswordAPI.Application.Controllers.Base;
+using MyPasswordAPI.Application.Helpers;
 using MyPasswordAPI.Application.ViewModels;
 using MyPasswordAPI.Domain.DTO;
 using MyPasswordAPI.Domain.Entities;
@@ -55,7 +56,15 @@ namespace MyPasswordAPI.Application.Controllers.API
                 {
                     Message = "Usuário inserido com sucesso.",
                     Success = true,
-                    Data = customerInserted
+                    Data = new
+                    {
+                        Id = customerInserted.Id,
+                        Name = customerInserted.Name,
+                        Email = customerInserted.Email,
+                        Password = customerInserted.Password,
+                        Token = TokenHelper.GenerateToken(customerInserted.Name, customerInserted.Email, _configuration["TokenKey"]),
+                        TokenExipreDate = DateTime.Now.AddHours(23)
+                    }
                 });
             }
             catch (Exception)

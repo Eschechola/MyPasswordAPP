@@ -1,12 +1,13 @@
 import 'package:mypassword/models/entities/customer.model.dart';
+import 'package:mypassword/models/entities/register.model.dart';
 import 'package:mypassword/models/enums/inputType.enum.dart';
 import 'package:mypassword/models/validators/base.validator.dart';
 import 'package:mypassword/models/validators/errorsValidation.model.dart';
 
-class CustomerValidator extends BaseValidator<Customer>{
+class RegisterValidator extends BaseValidator<Register>{
 
   @override
-  void validate(Customer customer){
+  void validate(Register customer){
 
     //name
     if(customer.name == null || customer.name == "")
@@ -32,5 +33,9 @@ class CustomerValidator extends BaseValidator<Customer>{
 
     if(customer.password.length < 6 || customer.password.length > 180)
       errors.add(new ErrorsValidation(inputType: InputType.password, error: "A senha deve ter entre 6 e 180 caracteres."));
+
+    //confirm password
+    if(customer.confirmPassword != customer.password)
+      errors.add(new ErrorsValidation(inputType: InputType.confirmPassword, error: "As senhas estão diferentes"));
   }
 }

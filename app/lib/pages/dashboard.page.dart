@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mypassword/blocs/bloc/customer.bloc.dart';
 import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
+import 'package:mypassword/models/entities/customer.model.dart';
 import 'package:mypassword/styles/app.colors.dart';
 import 'package:mypassword/widgets/mypassword.appBar.widget.dart';
 import 'package:mypassword/widgets/mypassword.bottomSheetMenu.widget.dart';
@@ -15,6 +17,21 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  
+  Customer _customer = null; 
+  
+  void _getCustomerSession() async{
+    await new CustomerBloc().getCustomerSession().then((value) => {
+      _setCustomerSession(value)
+    });
+  }
+
+  void _setCustomerSession(Customer customer){
+    setState(() {
+      _customer = customer;
+    });
+  }
+  
   void pushCreatePasswordPage(){
      NavigationBloc().pushTo(context, ManagePasswordPage());
   }
@@ -30,7 +47,15 @@ class _DashboardPageState extends State<DashboardPage> {
           );
       }
     );
-}
+  }
+
+  @override
+  void initState() {
+    //pega os dados de sessão do usuário
+    _getCustomerSession();
+
+    super.initState();
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -46,7 +71,8 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           children: <Widget>[
             MyPasswordHomeCard(
-              username: "usuário",
+              username: _customer.name,
+              isLoading: _customer.name == null,
             ),
             
             Padding(

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mypassword/styles/app.colors.dart';
 
@@ -6,13 +7,20 @@ import 'mypassword.card.widget.dart';
 class MyPasswordHomeCard extends StatelessWidget {
 
   String username = "";
+  bool isLoading = true;
 
-  MyPasswordHomeCard({@required this.username});
+  MyPasswordHomeCard({@required this.username, this.isLoading});
 
   @override
   Widget build(BuildContext context) {
     return MyPasswordCard(
-               child: Row(
+              child: isLoading ? 
+              Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: AppColors.cardText,
+                ),
+              ) 
+              : Row(
                  children: <Widget>[
                    Padding(
                      padding: EdgeInsets.only(

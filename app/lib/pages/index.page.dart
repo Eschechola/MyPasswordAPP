@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mypassword/blocs/bloc/customer.bloc.dart';
 import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
 import 'package:mypassword/pages/welcome.page.dart';
 import 'package:mypassword/styles/app.colors.dart';
@@ -12,7 +13,6 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexState extends State with SingleTickerProviderStateMixin {
-
   AnimationController rotationController;
 
   void pushHomePage(){

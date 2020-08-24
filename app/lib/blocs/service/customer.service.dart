@@ -2,21 +2,42 @@ import 'dart:io';
 
 import 'package:mypassword/models/entities/customer.model.dart';
 import 'package:http/http.dart' as http;
+import 'package:mypassword/models/entities/login.model.dart';
 import 'package:mypassword/settings/settings.dart';
 
 import 'baseHttp.service.dart';
 
 class CustomerService extends BaseHttp{
-  Future<http.Response> registerCustomer(Customer customer) async {
-    var client = getHttpClient();
-    var url = "${Settings.API_URL}/api/customer/insert";
+  dynamic _client;
+
+  CustomerService(){
+    _client = getHttpClient();
+  }
+
+  Future<http.Response> insertCustomer(Customer customer) async {
+    var url = "${Settings.API_URL}/customer/insert";
     
-    final response = await client.post(url,
+    final response = await _client.post(url,
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           //HttpHeaders.authorizationHeader: '',      
         },
         body: customer.toJson()
+    );
+
+    return response;
+  }
+
+  Future<http.Response> loginCustomer(Login loginCustomer) async {
+    var url = "${Settings.API_URL}/auth/login";
+
+    print(loginCustomer.toJson());
+
+    final response = await _client.post(url,
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        },
+        body: loginCustomer.toJson()
     );
 
     return response;

@@ -61,7 +61,7 @@ class NavMenu extends StatelessWidget {
                   ),
                   Padding(
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height * 0.34,
+                      top: MediaQuery.of(context).size.height * 0.30,
                     ),
                     child: ListTile(
                       leading: Icon(
@@ -75,7 +75,19 @@ class NavMenu extends StatelessWidget {
                       ),
                       onTap: () => {},
                     ),
-                  )
+                  ),
+                  ListTile(
+                      leading: Icon(
+                        Icons.exit_to_app,
+                        color: AppColors.secondaryColor,
+                      ),
+                      title: Text(
+                        "Logout",
+                        style: TextStyle(
+                            color: AppColors.secondaryColor, fontSize: 20),
+                      ),
+                      onTap: () => {},
+                    ),
                 ],
               ),
             ),

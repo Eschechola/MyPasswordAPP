@@ -65,7 +65,9 @@ namespace MyPasswordAPI.Application.Controllers.Authorize
                         Id = customer.Id,
                         Name = customer.Name,
                         Email = customer.Email,
-                        Token = TokenHelper.GenerateToken(customer, _configuration["TokenKey"])
+                        Password = customer.Password,
+                        Token = TokenHelper.GenerateToken(customer.Name, customer.Email, _configuration["TokenKey"]),
+                        TokenExipreDate = DateTime.Now.AddHours(23)
                     }
                 });
             }

@@ -1,13 +1,16 @@
 import 'package:mypassword/models/entities/base.model.dart';
 
 class Customer extends Base{
+  int id;
   String name;
   String email;
   String password;
-  String confirmPassword;
   int type;
+
+  String token;
+  String tokenExpireDate;
   
-  Customer({this.name, this.email, this.password, this.type, this.confirmPassword});
+  Customer({this.id = 0, this.name, this.email, this.password, this.type, this.token = "", this.tokenExpireDate = ""});
 
   Customer.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -21,7 +24,7 @@ class Customer extends Base{
     "{" +
       "\"id\": 0,"+
       "\"name\": \"${name}\","+
-      "\"email\": \"${email}\","+
+      "\"email\": \"${email.trimRight().trimLeft()}\","+
       "\"password\": \"${password}\","+
       "\"type\": ${type}"+
     "}";
@@ -31,6 +34,8 @@ class Customer extends Base{
       'name': name,
       'email': email,
       'password': password,
-      'type': type
+      'type': type,
+      'token': token,
+      'tokenExpireDate': tokenExpireDate
     };
 }

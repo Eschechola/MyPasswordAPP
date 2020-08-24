@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:mypassword/blocs/bloc/customer.bloc.dart';
 import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
+import 'package:mypassword/models/entities/customer.model.dart';
+import 'package:mypassword/models/entities/login.model.dart';
+import 'package:mypassword/models/enums/inputType.enum.dart';
+import 'package:mypassword/models/validators/errorsValidation.model.dart';
+import 'package:mypassword/models/validators/login.validator.dart';
 import 'package:mypassword/pages/dashboard.page.dart';
 import 'package:mypassword/pages/register.page.dart';
+import 'package:mypassword/settings/settings.dart';
 import 'package:mypassword/styles/app.colors.dart';
 import 'package:mypassword/widgets/mypassowrd.logo.widget.dart';
 import 'package:mypassword/widgets/mypassword.button.widget.dart';
 import 'package:mypassword/widgets/mypassword.input.widget.dart';
+import 'package:mypassword/widgets/mypassword.toast.widget.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,14 +21,110 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool remember = true;
+  bool isLoading = false;
+
+  bool rememberController = true;
+
+  final emailController = TextEditingController();
+  List<ErrorsValidation> emailErrors = new List<ErrorsValidation>();
+
+  final passwordController = TextEditingController();
+  List<ErrorsValidation> passwordErrors = new List<ErrorsValidation>();
 
   void pushRegisterPage(){
      NavigationBloc().pushReplacementTo(context, RegisterPage());
   }
 
   void pushDashboardPage(){
-     NavigationBloc().pushTo(context, DashboardPage());
+     NavigationBloc().popAllAndReplace(context, DashboardPage());
+  }
+
+  void clearErrors(InputType inputType){
+    setState(() {
+        switch(inputType){
+          case InputType.email:
+            emailErrors.clear();
+          break;
+
+          case InputType.password:
+            passwordErrors.clear();
+          break;
+      }
+    });
+  }
+
+  void addError(ErrorsValidation error){
+    setState(() {
+      switch(error.inputType){
+        case InputType.email:
+          emailErrors.add(error);
+        break;
+
+        case InputType.password:
+          passwordErrors.add(error);   
+        break;
+      }
+    });
+  }
+
+  void enableLoading(){
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+  void disableLoading(){
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void cleanAllErrors(){
+    emailErrors.clear();
+    passwordErrors.clear();
+  }
+
+  void loginUser() async {
+    try{
+      enableLoading();
+
+      var loginCustomer = new Login(
+        email: emailController.text,
+        password: passwordController.text,
+        remember: rememberController
+      );
+
+      var validator = new LoginValidator();
+      validator.validate(loginCustomer);
+
+      if(validator.errors.length > 0){
+        for(var error in validator.errors){
+          addError(error);    
+        }
+
+        disableLoading();
+        MyPasswordToast.showToast(Settings.INVALID_INPUTS_MESSAGE, context);
+      }
+      else{
+        await new CustomerBloc().loginCustomer(loginCustomer).then((result) => {
+          //limpa os erros
+          cleanAllErrors(),
+                  
+          //caso tenha registrado com sucesso, chama a homepage
+          if(result.success){
+            pushDashboardPage()
+          }
+          else{
+            MyPasswordToast.showToast(result.message, context),
+            disableLoading()
+          }
+        });
+      }
+    }
+    catch(ex){
+      MyPasswordToast.showToast(ex.toString(), context);
+      disableLoading();
+    }
   }
 
   @override
@@ -42,14 +146,18 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: <Widget>[
                   MyPasswordInput(
+                    controller: emailController,
                     hintText: "Digite seu email...",
                     keyboardType: TextInputType.text,
+                    errors: emailErrors,
                   ),
 
                   MyPasswordInput(
+                    controller: passwordController,
                     hintText: "Digite sua senha...",
                     keyboardType: TextInputType.text,
                     isPassword: true,
+                    errors: passwordErrors,
                   ),
                   
                   CheckboxListTile(
@@ -62,10 +170,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     activeColor: AppColors.thirdColor,
                     checkColor: AppColors.secondaryColor,
-                    value: remember,
+                    value: rememberController,
                     onChanged: (value) {
                       setState(() {
-                        remember = value;
+                        rememberController = value;
                       });
                     },
                     controlAffinity: ListTileControlAffinity.leading
@@ -106,11 +214,22 @@ class _LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.only(
                       top: MediaQuery.of(context).size.height * 0.03
                     ),
-                    child: MyPasswordButton(
-                      text: "Entrar",
-                      function: pushDashboardPage,
-                      inverseButton: false,
-                    )
+                    child: 
+                      isLoading ? 
+                      MyPasswordButton(
+                        text: '',
+                        inverseButton: false,
+                        iconButton: true,
+                        iconWidget: CircularProgressIndicator(
+                          backgroundColor: AppColors.secondaryColor,
+                        ),
+                        function: (){},
+                      )         
+                      : MyPasswordButton(
+                        text: "Entrar",
+                        function: loginUser,
+                        inverseButton: false,
+                      )
                   )
                 ],
               )
