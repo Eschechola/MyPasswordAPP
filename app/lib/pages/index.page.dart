@@ -16,7 +16,7 @@ class _IndexState extends State with SingleTickerProviderStateMixin {
   AnimationController rotationController;
 
   void pushHomePage(){
-    Timer(Duration(seconds: 5), (){
+    Timer(Duration(seconds: 1), (){
       NavigationBloc().pushReplacementTo(context, new WelcomePage());
     });
   } 

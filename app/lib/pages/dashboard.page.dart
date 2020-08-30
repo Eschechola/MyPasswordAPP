@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mypassword/blocs/bloc/customer.bloc.dart';
 import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
+import 'package:mypassword/blocs/bloc/password.bloc.dart';
 import 'package:mypassword/models/entities/customer.model.dart';
+import 'package:mypassword/models/entities/password.model.dart';
 import 'package:mypassword/styles/app.colors.dart';
 import 'package:mypassword/widgets/mypassword.appBar.widget.dart';
 import 'package:mypassword/widgets/mypassword.bottomSheetMenu.widget.dart';
@@ -17,9 +19,25 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  Customer _customer = null;
+  List<Password> _passwordsList = new List<Password>();
   
-  Customer _customer = null; 
-  
+  void _initPage() async {
+    await _getCustomerSession();
+    await _getAllPasswords(_customer.id, _customer.token);
+  }
+
+  void _convertResponseModelInPasswordList(dynamic response){
+    for(var password in response.data){
+      _passwordsList.add(new Password(
+        id: password["id"],
+        customerId: password["customerId"],
+        title: password["title"],
+        value: password["value"]
+      ));
+    }
+  }
+
   void _getCustomerSession() async{
     await new CustomerBloc().getCustomerSession().then((value) => {
       _setCustomerSession(value)
@@ -32,11 +50,11 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
   
-  void pushCreatePasswordPage(){
+  void _pushCreatePasswordPage(){
      NavigationBloc().pushTo(context, ManagePasswordPage());
   }
 
-  void callModalShowPassword(context, passwordId, passwordName, passwordValue){
+  void _callModalShowPassword(context, passwordId, passwordName, passwordValue){
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context){
@@ -49,16 +67,21 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  void _getAllPasswords(int id, String token) async{
+    await new PasswordBloc().getAllPasswords(id, token).then((response) => {
+      _convertResponseModelInPasswordList(response)
+    });
+  }
+
   @override
   void initState() {
-    //pega os dados de sessão do usuário
-    _getCustomerSession();
+    _initPage();
 
     super.initState();
   }
   
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContextcontext) {
     return Scaffold(
       drawer: NavMenu(),
       appBar: MyPasswordAppBar(
@@ -104,7 +127,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   itemBuilder: (BuildContext context, int index){
                     return MyPasswordCard(
                       onTap: () { 
-                        callModalShowPassword(context, 1, "Senha do email", "123");
+                        _callModalShowPassword(context, 1, "Senha do email", "123");
                       },
                       height: 80,
                       child: Row(
@@ -142,7 +165,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: pushCreatePasswordPage,//pushCreatePasswordPage,
+        onPressed: (){ _getAllPasswords(_customer.id, _customer.token); },//pushCreatePasswordPage,
         backgroundColor: AppColors.thirdColor,
         child: Icon(
           Icons.add

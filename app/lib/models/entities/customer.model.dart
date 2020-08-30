@@ -1,6 +1,4 @@
-import 'package:mypassword/models/entities/base.model.dart';
-
-class Customer extends Base{
+class Customer {
   int id;
   String name;
   String email;
@@ -10,7 +8,7 @@ class Customer extends Base{
   String token;
   String tokenExpireDate;
   
-  Customer({this.id = 0, this.name, this.email, this.password, this.type, this.token = "", this.tokenExpireDate = ""});
+  Customer({this.id, this.name, this.email, this.password, this.type, this.token, this.tokenExpireDate});
 
   Customer.fromJson(Map<String, dynamic> json) {
     id = json['id'];

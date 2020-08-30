@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:mypassword/models/entities/login.model.dart';
 import 'package:mypassword/settings/settings.dart';
 
-import 'baseHttp.service.dart';
+import 'base.service.dart';
 
-class CustomerService extends BaseHttp{
+class CustomerService extends BaseService{
   dynamic _client;
 
   CustomerService(){
@@ -20,7 +20,6 @@ class CustomerService extends BaseHttp{
     final response = await _client.post(url,
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
-          //HttpHeaders.authorizationHeader: '',      
         },
         body: customer.toJson()
     );

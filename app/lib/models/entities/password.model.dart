@@ -1,14 +1,14 @@
-import 'base.model.dart';
 import 'customer.model.dart';
 
-class Password extends Base{
+class Password {
+  int id;
   int customerId;
   String title;
   String value;
 
   Customer customer;
 
-  Password({id, this.customerId, this.title, this.value});
+  Password({this.id, this.customerId, this.title, this.value});
 
   Password.fromJson(Map<String, dynamic> json) {
     id = json['id'];
