@@ -39,6 +39,20 @@ class NavigationBloc{
       ));
   }
 
+  void pop(BuildContext context, [bool needInternetConnection = true]) async {
+    if(needInternetConnection){
+      var haveConnection = await new ConnectivityBloc().userHaveInternetConnection();
+
+      if(!haveConnection){
+        _pushToNoConnectionPage(context);
+        return;
+      }
+    }
+
+    Navigator.of(context).pop(context);
+  }
+
+
   void popAllAndReplace(BuildContext context, Widget widgetPage, [bool needInternetConnection = true]) async {
     if(needInternetConnection){
       var haveConnection = await new ConnectivityBloc().userHaveInternetConnection();

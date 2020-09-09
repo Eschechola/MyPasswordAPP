@@ -8,5 +8,6 @@ class Settings{
   static const QUERY_DELETE_ALL_CUSTOMERS = "DELETE FROM customers WHERE id > -1";
   static const QUERY_GET_ALL_CUSTOMERS_BY_EMAIL = "SELECT * FROM customers WHERE email = ";
   static const ERROR_API_MESSAGE = "Ocorreu algum erro ao se comunicar com a base de dados. Tente novamente.";
-  static var INVALID_INPUTS_MESSAGE = "Campos inválidos, corrija e tente novamente";
+  static const INVALID_INPUTS_MESSAGE = "Campos inválidos, corrija e tente novamente";
+  static const NOT_ACCEPT_USE_TERMS = "Você precisa aceitar os TERMOS DE USO.";
 }

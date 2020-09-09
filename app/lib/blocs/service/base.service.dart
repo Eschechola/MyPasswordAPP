@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/io_client.dart';
 
 class BaseService{
-  getHttpClient(){
+  IOClient getHttpClient(){
     bool trustSelfSigned = true;
     HttpClient httpClient = new HttpClient()
     
@@ -12,5 +12,18 @@ class BaseService{
     IOClient client = new IOClient(httpClient);
     
     return client;
+  }
+
+  Object getDefaultHeaders(){
+    return {
+      HttpHeaders.contentTypeHeader: 'application/json'
+    };
+  }
+
+  Object getDefaultHeadersWithToken(String token){
+    return {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer ${token}'
+    };
   }
 }

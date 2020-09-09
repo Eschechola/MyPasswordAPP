@@ -32,7 +32,7 @@ class MyPasswordHomeCard extends StatelessWidget {
                       height: 90,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: AppColors.thirdColor,
+                        color: AppColors.primaryColor,
                         borderRadius: BorderRadius.circular(80)
                       ),
                       child: Container(
@@ -42,6 +42,9 @@ class MyPasswordHomeCard extends StatelessWidget {
                           color: AppColors.cardColor,
                           borderRadius: BorderRadius.circular(87)
                         ),
+                        child: Image(
+                          image: AssetImage('assets/images/home-user.png'),
+                        )
                       ), 
                     ), 
                    ),

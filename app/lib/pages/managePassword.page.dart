@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mypassword/blocs/bloc/customer.bloc.dart';
+import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
+import 'package:mypassword/blocs/bloc/password.bloc.dart';
+import 'package:mypassword/models/entities/customer.model.dart';
+import 'package:mypassword/models/entities/password.model.dart';
+import 'package:mypassword/models/enums/inputType.enum.dart';
+import 'package:mypassword/models/validators/errorsValidation.model.dart';
+import 'package:mypassword/models/validators/password.validator.dart';
+import 'package:mypassword/settings/settings.dart';
 import 'package:mypassword/styles/app.colors.dart';
 import 'package:mypassword/widgets/mypassword.appBar.widget.dart';
 import 'package:mypassword/widgets/mypassword.button.widget.dart';
 import 'package:mypassword/widgets/mypassword.input.widget.dart';
 import 'package:mypassword/widgets/mypassword.navmenu.dart';
+import 'package:mypassword/widgets/mypassword.toast.widget.dart';
 
 class ManagePasswordPage extends StatefulWidget {
   @override
@@ -12,10 +22,136 @@ class ManagePasswordPage extends StatefulWidget {
 }
 
 class _ManagePasswordPage extends State<ManagePasswordPage> {
+  Customer _customer;
+
   bool acceptedTerms = true;
 
-  void savePassword(){
+  bool isLoading = false;
 
+   final titleController = TextEditingController();
+   List<ErrorsValidation> titleErrors = new List<ErrorsValidation>();
+
+  final valueController = TextEditingController();
+  List<ErrorsValidation> valueErrors = new List<ErrorsValidation>();
+
+  void _initPage() async{
+    await _getCustomerSession();
+  }
+
+  void _getCustomerSession() async{
+    await new CustomerBloc().getCustomerSession().then((value) => {
+      _setCustomerSession(value)
+    });
+  }
+
+  void _setCustomerSession(Customer customer){
+    setState(() {
+      _customer = customer;
+    });
+  }
+
+  void _clearErrors(InputType inputType){
+    setState(() {
+        switch(inputType){
+          case InputType.value:
+            valueErrors.clear();
+          break;
+
+          case InputType.title:
+            titleErrors.clear();
+          break;
+      }
+    });
+  }
+
+  void _addError(ErrorsValidation error){
+    setState(() {
+      switch(error.inputType){
+        case InputType.title:
+          titleErrors.add(error);
+        break;
+
+        case InputType.value:
+          valueErrors.add(error);   
+        break;
+      }
+    });
+  }
+
+  void _enableLoading(){
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+  void _disableLoading(){
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void _cleanAllErrors(){
+    titleErrors.clear();
+    valueErrors.clear();
+  }
+
+  void _insertPassword() async {
+    try
+    {
+      _enableLoading();
+
+      var password = new Password(
+        customerId: _customer.id,
+        title: titleController.text,
+        value: valueController.text,
+      );
+
+      //caso não tenha aceito os termos
+      if(!acceptedTerms){
+        MyPasswordToast.showToast(Settings.NOT_ACCEPT_USE_TERMS, context);
+        return;
+      }
+        
+
+      var validator = new PasswordValidator();
+      validator.validate(password);
+
+      if(validator.errors.length > 0)
+      {
+        for(var error in validator.errors){
+          _addError(error);    
+        }
+
+        _disableLoading();
+        MyPasswordToast.showToast(Settings.INVALID_INPUTS_MESSAGE, context);
+      }
+      else{
+        await new PasswordBloc(_customer.token).insertPassword(password).then((result) => {
+          //limpa os erros
+          _cleanAllErrors(),
+
+          MyPasswordToast.showToast(result.message, context),
+
+          if(result.success)
+            NavigationBloc().pop(context)
+          
+          else
+            _disableLoading()
+        });
+      }
+    }
+    catch(ex)
+    {
+      MyPasswordToast.showToast(ex.toString(), context);
+      _disableLoading();
+    }
+  }
+
+  @override
+  void initState() {
+    _initPage();
+
+    super.initState();
   }
   
   @override
@@ -50,12 +186,16 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
             MyPasswordInput(
               hintText: "Digite de onde é a senha...",
               keyboardType: TextInputType.text,
+              controller: titleController,
+              errors: titleErrors,
             ),
 
             MyPasswordInput(
               hintText: "Digite a senha...",
               keyboardType: TextInputType.text,
               isPassword: true,
+              controller: valueController,
+              errors: valueErrors,
             ),
 
             CheckboxListTile(
@@ -95,7 +235,7 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
               ),
 
               MyPasswordButton(
-                function: savePassword,
+                function: _insertPassword,
                 inverseButton: false,
                 text: "Salvar",
               )

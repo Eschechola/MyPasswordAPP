@@ -31,15 +31,15 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   List<ErrorsValidation> passwordErrors = new List<ErrorsValidation>();
 
-  void pushRegisterPage(){
+  void _pushRegisterPage(){
      NavigationBloc().pushReplacementTo(context, RegisterPage());
   }
 
-  void pushDashboardPage(){
+  void _pushDashboardPage(){
      NavigationBloc().popAllAndReplace(context, DashboardPage());
   }
 
-  void clearErrors(InputType inputType){
+  void _clearErrors(InputType inputType){
     setState(() {
         switch(inputType){
           case InputType.email:
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void addError(ErrorsValidation error){
+  void _addError(ErrorsValidation error){
     setState(() {
       switch(error.inputType){
         case InputType.email:
@@ -67,26 +67,26 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void enableLoading(){
+  void _enableLoading(){
     setState(() {
       isLoading = true;
     });
   }
 
-  void disableLoading(){
+  void _disableLoading(){
     setState(() {
       isLoading = false;
     });
   }
 
-  void cleanAllErrors(){
+  void _cleanAllErrors(){
     emailErrors.clear();
     passwordErrors.clear();
   }
 
-  void loginUser() async {
+  void _loginUser() async {
     try{
-      enableLoading();
+      _enableLoading();
 
       var loginCustomer = new Login(
         email: emailController.text,
@@ -99,31 +99,31 @@ class _LoginPageState extends State<LoginPage> {
 
       if(validator.errors.length > 0){
         for(var error in validator.errors){
-          addError(error);    
+          _addError(error);    
         }
 
-        disableLoading();
+        _disableLoading();
         MyPasswordToast.showToast(Settings.INVALID_INPUTS_MESSAGE, context);
       }
       else{
         await new CustomerBloc().loginCustomer(loginCustomer).then((result) => {
           //limpa os erros
-          cleanAllErrors(),
+          _cleanAllErrors(),
                   
           //caso tenha registrado com sucesso, chama a homepage
           if(result.success){
-            pushDashboardPage()
+            _pushDashboardPage()
           }
           else{
             MyPasswordToast.showToast(result.message, context),
-            disableLoading()
+            _disableLoading()
           }
         });
       }
     }
     catch(ex){
       MyPasswordToast.showToast(ex.toString(), context);
-      disableLoading();
+      _disableLoading();
     }
   }
 
@@ -197,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
 
                         InkWell(
-                          onTap: pushRegisterPage,
+                          onTap: _pushRegisterPage,
                           child: Text(
                             "Cadastre-se",
                             style: TextStyle(
@@ -227,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                       )         
                       : MyPasswordButton(
                         text: "Entrar",
-                        function: loginUser,
+                        function: _loginUser,
                         inverseButton: false,
                       )
                   )

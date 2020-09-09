@@ -4,6 +4,11 @@ import 'package:toast/toast.dart';
 
 class MyPasswordToast {
   static void showToast(String message, BuildContext context) {
+    message.replaceAll("Exception", "");
+    message.replaceAll("Exception:", "");
+    message.replaceAll("exception", "");
+    message.replaceAll("exception:", "");
+
     Toast.show(
       message,
       context,

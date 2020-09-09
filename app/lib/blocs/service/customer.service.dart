@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:mypassword/models/entities/customer.model.dart';
 import 'package:http/http.dart' as http;
 import 'package:mypassword/models/entities/login.model.dart';
@@ -17,10 +15,9 @@ class CustomerService extends BaseService{
   Future<http.Response> insertCustomer(Customer customer) async {
     var url = "${Settings.API_URL}/customer/insert";
     
-    final response = await _client.post(url,
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+    final response = await _client.post(
+        url,
+        headers: getDefaultHeaders(),
         body: customer.toJson()
     );
 
@@ -32,10 +29,9 @@ class CustomerService extends BaseService{
 
     print(loginCustomer.toJson());
 
-    final response = await _client.post(url,
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+    final response = await _client.post(
+        url,
+        headers: getDefaultHeaders(),
         body: loginCustomer.toJson()
     );
 

@@ -17,12 +17,12 @@ class Password {
     value = json['value'];
   }
 
-  Map<String, dynamic> toJson() =>
-  {
-      'id': 0,
-      'customerId': customerId,
-      'title': title,
-      'value': value
-  };
+  String toJson() =>
+    "{" +
+      "\"id\": 0,"+
+      "\"customerId\": ${customerId},"+
+      "\"title\": \"${title.trimRight().trimLeft()}\","+
+      "\"value\": \"${value}\""+
+    "}";
 }
 
