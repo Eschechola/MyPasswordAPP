@@ -55,6 +55,7 @@ flutter:
     - assets/images/home-bg.png
     - assets/images/lost-connection.png
     - assets/images/home-user.png
+    - assets/images/no-password-icon.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

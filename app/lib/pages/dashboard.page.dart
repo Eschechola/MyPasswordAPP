@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:mypassword/blocs/bloc/customer.bloc.dart';
 import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
@@ -12,6 +10,7 @@ import 'package:mypassword/widgets/mypassword.bottomSheetMenu.widget.dart';
 import 'package:mypassword/widgets/mypassword.card.widget.dart';
 import 'package:mypassword/widgets/mypassword.homecard.widget.dart';
 import 'package:mypassword/widgets/mypassword.navmenu.dart';
+import 'package:mypassword/widgets/mypassword.noPassword.widget.dart';
 
 import 'managePassword.page.dart';
 
@@ -24,7 +23,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Customer _customer;
   List<Password> _passwordsList = new List<Password>();
   
-  void _initPage() async {
+  Future _initPage() async {
     await _getCustomerSession();
     await _getAllPasswords(_customer.id, _customer.token);
     
@@ -32,23 +31,26 @@ class _DashboardPageState extends State<DashboardPage> {
     _loadingPasswords();
   }
 
-  void _loadingPasswords() async{
+  Future _loadingPasswords() async{
     while(true){
       await new Future.delayed(const Duration(seconds : 3));
       await _getAllPasswords(_customer.id, _customer.token);
     }
   }
 
-  void _getCustomerSession() async{
+  Future _getCustomerSession() async{
     await new CustomerBloc().getCustomerSession().then((value) => {
       _setCustomerSession(value)
     });
   }
 
-  void _getAllPasswords(int id, String token) async{
-    await new PasswordBloc(token).getAllPasswords(id).then((response) => {
-      _setPasswordList(_convertResponseModelInPasswordList(response))
-    });
+  Future _getAllPasswords(int id, String token) async{
+    try{
+      await new PasswordBloc().getAllPasswords(id).then((response) => {
+        _setPasswordList(_convertResponseModelInPasswordList(response))
+      });
+    }
+    catch(Exception){}
   }
 
   void _setPasswordList(List<Password> passwordList){
@@ -63,8 +65,21 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
   
-  void _pushCreatePasswordPage() async {
+  Future _pushCreatePasswordPage() async {
      NavigationBloc().pushTo(context, ManagePasswordPage());
+  }
+
+  void _callModalShowPassword(context, passwordId, passwordName, passwordValue) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context){
+          return MyPassowrdBottomSheetMenu(
+            passwordId: passwordId,
+            passwordName: passwordName,
+            passwordValue: passwordValue,
+          );
+      }
+    );
   }
 
   List<Password> _convertResponseModelInPasswordList(dynamic response){
@@ -80,19 +95,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     return passwordList;
-  }
-
-  void _callModalShowPassword(context, passwordId, passwordName, passwordValue){
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context){
-          return MyPassowrdBottomSheetMenu(
-            passwordId: passwordId,
-            passwordName: passwordName,
-            passwordValue: passwordValue,
-          );
-      }
-    );
   }
 
   String _convertPasswordValueToPasswordChar(String password){
@@ -112,7 +114,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
   
   @override
-  Widget build(BuildContextcontext) {
+  Widget build(BuildContext context) {
     return Scaffold(
       drawer: NavMenu(),
       appBar: MyPasswordAppBar(
@@ -128,7 +130,6 @@ class _DashboardPageState extends State<DashboardPage> {
               username: _customer.name,
               isLoading: _customer.name == null,
             ),
-            
             Padding(
               padding: EdgeInsets.only(
                 top: 80,
@@ -155,13 +156,17 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: 
                 RefreshIndicator(
                   onRefresh: () async { await _getAllPasswords(_customer.id, _customer.token); },
-                  child: ListView.builder(
+                  child: _passwordsList.length == 0 ?
+                  
+                  MyPasswordNoPassword()
+                  
+                  : ListView.builder(
                     padding: EdgeInsets.only(bottom: 15),
                     itemCount: _passwordsList.length,
                     itemBuilder: (BuildContext context, int index){
                       return MyPasswordCard(
                         onTap: () { 
-                          _callModalShowPassword(context, 1, _passwordsList[index].title, _passwordsList[index].value);
+                          _callModalShowPassword(context, _passwordsList[index].id, _passwordsList[index].title, _passwordsList[index].value);
                         },
                         height: 80,
                         child: Row(
@@ -174,7 +179,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                 size: MediaQuery.of(context).size.height * 0.05,
                               ), 
                             ),
-
                             Padding(
                               padding: EdgeInsets.only(
                                 top: 10
@@ -188,7 +192,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               ),
                             ),
                           ],
-                        )
+                        ),
                       );
                     },
                   ),

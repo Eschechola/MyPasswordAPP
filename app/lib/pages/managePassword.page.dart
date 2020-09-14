@@ -8,6 +8,7 @@ import 'package:mypassword/models/entities/password.model.dart';
 import 'package:mypassword/models/enums/inputType.enum.dart';
 import 'package:mypassword/models/validators/errorsValidation.model.dart';
 import 'package:mypassword/models/validators/password.validator.dart';
+import 'package:mypassword/pages/dashboard.page.dart';
 import 'package:mypassword/settings/settings.dart';
 import 'package:mypassword/styles/app.colors.dart';
 import 'package:mypassword/widgets/mypassword.appBar.widget.dart';
@@ -34,11 +35,11 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
   final valueController = TextEditingController();
   List<ErrorsValidation> valueErrors = new List<ErrorsValidation>();
 
-  void _initPage() async{
+  Future _initPage() async{
     await _getCustomerSession();
   }
 
-  void _getCustomerSession() async{
+  Future _getCustomerSession() async{
     await new CustomerBloc().getCustomerSession().then((value) => {
       _setCustomerSession(value)
     });
@@ -95,7 +96,7 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
     valueErrors.clear();
   }
 
-  void _insertPassword() async {
+  Future _insertPassword() async {
     try
     {
       _enableLoading();
@@ -111,7 +112,6 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
         MyPasswordToast.showToast(Settings.NOT_ACCEPT_USE_TERMS, context);
         return;
       }
-        
 
       var validator = new PasswordValidator();
       validator.validate(password);
@@ -126,14 +126,14 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
         MyPasswordToast.showToast(Settings.INVALID_INPUTS_MESSAGE, context);
       }
       else{
-        await new PasswordBloc(_customer.token).insertPassword(password).then((result) => {
+        await new PasswordBloc().insertPassword(password).then((result) => {
           //limpa os erros
           _cleanAllErrors(),
 
           MyPasswordToast.showToast(result.message, context),
 
           if(result.success)
-            NavigationBloc().pop(context)
+            NavigationBloc().popAllAndReplace(context, new DashboardPage())
           
           else
             _disableLoading()

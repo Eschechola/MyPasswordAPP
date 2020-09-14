@@ -14,6 +14,11 @@ namespace MyPasswordAPI.Services.Services
             _passwordRepository = passwordRepository;
         }
 
+        public void Delete(int id)
+        {
+            _passwordRepository.Delete(id);
+        }
+
         public IList<Password> GetAllFromCustomer(int userID)
         {
             return _passwordRepository.GetAllFromCustomer(userID);

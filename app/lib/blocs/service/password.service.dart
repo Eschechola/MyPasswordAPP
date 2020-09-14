@@ -1,5 +1,4 @@
 import 'package:mypassword/blocs/service/base.service.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:mypassword/models/entities/password.model.dart';
 import 'package:mypassword/settings/settings.dart';
@@ -24,11 +23,23 @@ class PasswordService extends BaseService {
 
   Future<http.Response> insertPassword(Password password, String token) async {
     var url = "${Settings.API_URL}/password/insert";
-
+    var body = password.toJson();
+    
     final response = _client.post(
       url,
       headers: getDefaultHeadersWithToken(token),
-      body: password.toJson()
+      body: body
+    );
+
+    return response;
+  }
+
+  Future<http.Response> deletePassword(int id, String token) async{
+    var url = "${Settings.API_URL}/password/delete/${id}";
+    
+    final response = _client.delete(
+      url,
+      headers: getDefaultHeadersWithToken(token)
     );
 
     return response;

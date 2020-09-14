@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mypassword/blocs/bloc/customer.bloc.dart';
+import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
+import 'package:mypassword/blocs/bloc/password.bloc.dart';
+import 'package:mypassword/pages/dashboard.page.dart';
 import 'package:mypassword/styles/app.colors.dart';
+import 'package:mypassword/widgets/mypassword.alertDialog.dart';
+import 'package:mypassword/widgets/mypassword.toast.widget.dart';
 
 class MyPassowrdBottomSheetMenu extends StatefulWidget {
   int passwordId;
   String passwordName;
   String passwordValue;
   bool passwordHidden = true;
+
   String get passwordValueEncoded {
     String valueEncoded = "";
 
-    for (int i = 0; i < passwordValue.length; i++) {
+    for (int i = 0; i < passwordValue.length; i++)
       valueEncoded += "*";
-    }
 
     return valueEncoded;
   }
@@ -28,18 +34,66 @@ class MyPassowrdBottomSheetMenu extends StatefulWidget {
 }
 
 class _MyPassowrdBottomSheetMenuState extends State<MyPassowrdBottomSheetMenu> {
-  void deletePassword() {
-    print('delete password');
-  }
-
   void viewPassword() {
     setState(() {
       widget.passwordHidden = !widget.passwordHidden;
     });
   }
 
-  void editPassoword() {
-    print('edit password');
+  Future _pushModalDeletePassword() async {
+    var modalButtons = new List<Widget>();
+
+    //ADICIONA OS BOTOÕES DO MODAL
+    modalButtons.add(
+      FlatButton(
+        child: Text(
+          "NÃO",
+          style: TextStyle(
+            fontSize: 18
+          ),
+        ),
+        textColor: AppColors.thirdColor,
+        onPressed: (){
+          NavigationBloc().pop(context);
+        }
+      )
+    );
+    
+    modalButtons.add(
+      FlatButton(
+        child: Text(
+          "SIM",
+          style: TextStyle(
+            fontSize: 18
+          ),
+        ),
+        textColor: AppColors.thirdColor,
+        onPressed: (){
+          _deletePassword(widget.passwordId);
+        }
+      )
+    );
+
+    MyPasswordAlertDialog(
+      'EXCLUSÃO DE SENHA',
+      'Deseja realmente excluir a senha: \'${widget.passwordName}\'?',
+      context,
+      modalButtons
+    )
+    .showModalDialog();
+  }
+
+  Future _deletePassword(int id) async{
+    await PasswordBloc().deletePassword(id).then((response) => {
+      if(response.success)
+        new NavigationBloc().popAllAndReplace(context, new DashboardPage()),
+
+      MyPasswordToast.showToast(response.message, context)
+    });
+  }
+
+  void _updatePassword(){
+    
   }
 
   @override
@@ -128,7 +182,7 @@ class _MyPassowrdBottomSheetMenuState extends State<MyPassowrdBottomSheetMenu> {
                                   color: AppColors.secondaryColor,
                                   fontSize: 20),
                             ),
-                            onTap: editPassoword),
+                            onTap: _updatePassword),
                         ListTile(
                           leading: Icon(
                             Icons.delete,
@@ -139,7 +193,7 @@ class _MyPassowrdBottomSheetMenuState extends State<MyPassowrdBottomSheetMenu> {
                             style: TextStyle(
                                 color: AppColors.secondaryColor, fontSize: 20),
                           ),
-                          onTap: deletePassword,
+                          onTap: _pushModalDeletePassword
                         ),
                       ],
                     ))

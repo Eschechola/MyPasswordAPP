@@ -1,13 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter_session/flutter_session.dart';
+import 'package:mypassword/blocs/bloc/base.bloc.dart';
 import 'package:mypassword/blocs/service/customer.service.dart';
 import 'package:mypassword/models/entities/response.model.dart';
 import 'package:mypassword/models/entities/customer.model.dart';
 import 'package:mypassword/models/entities/login.model.dart';
 import 'package:mypassword/settings/settings.dart';
 
-class CustomerBloc {
+class CustomerBloc extends BaseBloc{
 
   FlutterSession _session;
 
@@ -30,74 +31,59 @@ class CustomerBloc {
     print(await _session.get("tokenExpireDate"));
   }
 
-  Future<Customer> getCustomerSession() async {
-    var customer = new Customer(
-      id: await _session.get("id"),
-      name: await _session.get("name"),
-      email: await _session.get("email"),
-      token: await _session.get("token"),
-      tokenExpireDate: await _session.get("tokenExpireDate")
-    );
-    
-    return customer;
-  }
-
   Future<ResponseModel> insertCustomer(Customer customer) async {
-    dynamic apiResponse;
-    
-    //insere o usuário no banco de dados WEB
-    await new CustomerService().insertCustomer(customer).then((response) =>{
-      apiResponse = json.decode(response.body)
-      }
-    );
+    try{
+      dynamic apiResponse;
+      
+      //insere o usuário no banco de dados WEB
+      await new CustomerService().insertCustomer(customer).then((response) =>{
+        apiResponse = json.decode(response.body)
+        }
+      );
 
-    //erro caso a rota não seja encontrada
-    if(apiResponse == null)
+      var response = await super.valitadeResponse(apiResponse);
+
+      if(response.success)
+        //cria a sessão do usuário
+        customer.token = response.data["token"]["token"];
+        customer.tokenExpireDate = response.data["token"]["tokenExpires"];
+        await _createCustomerSession(customer);
+
+      return response;
+    }
+    catch(Exception){
       return new ResponseModel(message: Settings.ERROR_API_MESSAGE, success: false, data: null);
-
-    ResponseModel responseModel = new ResponseModel().convertApiResponseToResponseModel(apiResponse);
-
-    //erro caso o cliente não seja inserido
-    if(!responseModel.success)
-      return new ResponseModel(message: responseModel.message, success: false, data: null);
-
-    //cria a sessão do usuário
-    customer.token = responseModel.data["token"]["token"];
-    customer.tokenExpireDate = responseModel.data["token"]["tokenExpires"];
-    await _createCustomerSession(customer);
-
-    return responseModel;
+    }  
   }
 
   Future<ResponseModel> loginCustomer(Login loginCustomer) async{
-    dynamic apiResponse;
+    try{
+       dynamic apiResponse;
 
-    //loga o usuário no banco de dados WEB
-    await new CustomerService().loginCustomer(loginCustomer).then((response) =>{
-      apiResponse = json.decode(response.body),
-    });
+      //loga o usuário no banco de dados WEB
+      await new CustomerService().loginCustomer(loginCustomer).then((response) =>{
+        apiResponse = json.decode(response.body),
+      });
 
-    //erro caso a rota não seja encontrada
-    if(apiResponse == null)
+     var response = await super.valitadeResponse(apiResponse);
+
+      if(response.success){
+        //cria a sessão do usuário
+        var customer = new Customer(
+          id: response.data["id"],
+          name: response.data["name"],
+          email: loginCustomer.email,
+          token: response.data["token"],
+          tokenExpireDate: response.data["tokenExpireDate"]
+        );
+
+        await _createCustomerSession(customer);
+      }
+        
+      return response;
+    }
+    catch(Exception){
       return new ResponseModel(message: Settings.ERROR_API_MESSAGE, success: false, data: null);
-
-    ResponseModel responseModel = new ResponseModel().convertApiResponseToResponseModel(apiResponse);
-
-    //erro caso o login não seja realizado
-    if(!responseModel.success)
-      return new ResponseModel(message: responseModel.message, success: false, data: null);
-
-    //cria a sessão do usuário
-    var customer = new Customer(
-      id: responseModel.data["id"],
-      name: responseModel.data["name"],
-      email: loginCustomer.email,
-      token: responseModel.data["token"],
-      tokenExpireDate: responseModel.data["tokenExpireDate"]
-    );
-
-    await _createCustomerSession(customer);
-    
-    return responseModel;
+    }
   }
 }

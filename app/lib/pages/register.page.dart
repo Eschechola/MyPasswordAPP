@@ -64,7 +64,6 @@ class _RegisterPageState extends State<RegisterPage> {
     confirmPasswordErrors.clear();
   }
 
-
   void clearErrors(InputType inputType){
     setState(() {
         switch(inputType){
@@ -109,7 +108,7 @@ class _RegisterPageState extends State<RegisterPage> {
     });
   }
 
-  void registerCustomer() async {
+  Future registerCustomer() async {
     try{
         enableLoading();
             
@@ -163,7 +162,6 @@ class _RegisterPageState extends State<RegisterPage> {
           disableLoading();
         }
     }
-
 
   @override
   Widget build(BuildContext context) {

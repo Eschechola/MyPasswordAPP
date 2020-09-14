@@ -5,7 +5,7 @@ class ResponseModel{
   bool success;
   dynamic data;
 
-  ResponseModel({@required this.message, @required this.success, @required this.data});
+  ResponseModel({this.message, this.success, this.data});
 
   ResponseModel convertApiResponseToResponseModel(dynamic response){
     return new ResponseModel(

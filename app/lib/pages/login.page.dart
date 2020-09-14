@@ -84,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
     passwordErrors.clear();
   }
 
-  void _loginUser() async {
+  Future _loginUser() async {
     try{
       _enableLoading();
 

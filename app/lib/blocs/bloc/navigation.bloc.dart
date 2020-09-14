@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mypassword/blocs/bloc/base.bloc.dart';
 import 'package:mypassword/blocs/bloc/connectivity.bloc.dart';
 import 'package:mypassword/pages/noConnection.page.dart';
 
-class NavigationBloc{
+class NavigationBloc extends BaseBloc{
   
   void _pushToNoConnectionPage(BuildContext context) async{ 
     pushTo(context, new NoConnectionPage(), false);

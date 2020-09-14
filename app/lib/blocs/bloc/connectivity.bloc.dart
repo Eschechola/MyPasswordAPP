@@ -1,6 +1,8 @@
 import 'dart:io';
 
-class ConnectivityBloc{
+import 'package:mypassword/blocs/bloc/base.bloc.dart';
+
+class ConnectivityBloc extends BaseBloc{
   Future<bool> userHaveInternetConnection() async{
     try {
       final result = await InternetAddress.lookup('google.com');

@@ -1,51 +1,64 @@
 import 'dart:convert';
 
+import 'package:mypassword/blocs/bloc/base.bloc.dart';
 import 'package:mypassword/blocs/service/password.service.dart';
+import 'package:mypassword/models/entities/customer.model.dart';
 import 'package:mypassword/models/entities/password.model.dart';
 import 'package:mypassword/models/entities/response.model.dart';
 import 'package:mypassword/settings/settings.dart';
 
-class PasswordBloc{
+class PasswordBloc extends BaseBloc{
+  Customer _customer;
 
-  String _token;
-
-  PasswordBloc(String token){
-    _token = token;
+  Future _getCustomer() async{
+    _customer = await getCustomerSession();
   }
 
   Future<ResponseModel> getAllPasswords(int id) async{
-    dynamic apiResponse;
+    try{
+      dynamic apiResponse;
+      await _getCustomer();
 
-    await new PasswordService().getAllPasswords(id, _token).then((response) =>{
-      apiResponse = json.decode(response.body),
-    });
+      await new PasswordService().getAllPasswords(id, _customer.token).then((response) =>{
+        apiResponse = json.decode(response.body),
+      });
 
-    if(apiResponse == null)
+      return await super.valitadeResponse(apiResponse);
+    }
+    catch(Exception){
       return new ResponseModel(message: Settings.ERROR_API_MESSAGE, success: false, data: null);
-
-    ResponseModel responseModel = new ResponseModel().convertApiResponseToResponseModel(apiResponse);
-
-    if(!responseModel.success)
-      return new ResponseModel(message: responseModel.message, success: false, data: null);
-
-    return responseModel;
+    }
   }
 
   Future<ResponseModel> insertPassword(Password password) async{
-    dynamic apiResponse;
+    try{
+      dynamic apiResponse;
+      await _getCustomer();
 
-    await new PasswordService().insertPassword(password, _token).then((response) => {
-      apiResponse = json.decode(response.body),
-    });
+      await new PasswordService().insertPassword(password, _customer.token).then((response) => {
+        apiResponse = json.decode(response.body),
+      });
 
-    if(apiResponse == null)
+      return await super.valitadeResponse(apiResponse);
+    }
+    catch(Exception){
       return new ResponseModel(message: Settings.ERROR_API_MESSAGE, success: false, data: null);
+    }
+  }
 
-    ResponseModel responseModel = new ResponseModel().convertApiResponseToResponseModel(apiResponse);
+  Future<ResponseModel> deletePassword(int id) async{
+    // try{
+      dynamic apiResponse;
+      await _getCustomer();
 
-    if(!responseModel.success)
-      return new ResponseModel(message: responseModel.message, success: false, data: null);
+      await new PasswordService().deletePassword(id, _customer.token).then((response) => {
+        apiResponse = json.decode(response.body)
+      });
 
-    return responseModel;
+      return await super.valitadeResponse(apiResponse);
+    // }
+    // catch(Exception e){
+    //   return new ResponseModel(message: Settings.ERROR_API_MESSAGE, success: false, data: null);
+    // }
   }
 }

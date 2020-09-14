@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -63,12 +64,12 @@ namespace MyPasswordAPI.Application.Controllers
         }
 
         [HttpGet]
-        [Route("get-all/{userID}")]
-        public IActionResult GetAllCustomerPasswords(int userID = 0)
+        [Route("get-all/{id}")]
+        public IActionResult GetAllCustomerPasswords(int id = 0)
         {
             try
             {
-                if (userID == 0)
+                if (id == 0)
                     return BadRequest(new ResultViewModel
                     {
                         Message = "Insira um ID de usuário válido.",
@@ -76,13 +77,42 @@ namespace MyPasswordAPI.Application.Controllers
                         Data = null
                     });
 
-                var customerPasswords = _passwordService.GetAllFromCustomer(userID);
+                var customerPasswords = _passwordService.GetAllFromCustomer(id);
 
                 return Ok(new ResultViewModel
                 {
                     Message = "Senhas encontradas com sucesso.",
                     Success = true,
                     Data = customerPasswords
+                });
+            }
+            catch (Exception)
+            {
+                return InternalServerError;
+            }
+        }
+
+        [HttpDelete]
+        [Route("delete/{id}")]
+        public IActionResult DeleteCustomer(int id = 0)
+        {
+            try
+            {
+                if (id == 0)
+                    return BadRequest(new ResultViewModel
+                    {
+                        Message = "Insira um ID de usuário válido.",
+                        Success = false,
+                        Data = null
+                    });
+
+                _passwordService.Delete(id);
+
+                return Ok(new ResultViewModel
+                {
+                    Message = "Senha deletada com sucesso.",
+                    Success = true,
+                    Data = null
                 });
             }
             catch (Exception)
