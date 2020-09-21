@@ -19,7 +19,7 @@ class Password {
 
   String toJson() =>
     "{" +
-      "\"id\": 0,"+
+      "\"id\": ${id != 0 ? id : 0},"+
       "\"customerId\": ${customerId},"+
       "\"title\": \"${title.trimRight().trimLeft()}\","+
       "\"value\": \"${value}\""+

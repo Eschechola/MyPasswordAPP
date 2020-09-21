@@ -8,5 +8,7 @@ namespace MyPasswordAPI.Services.Interfaces
         Password Insert(Password password);
         IList<Password> GetAllFromCustomer(int userID);
         void Delete(int id);
+        Password Get(int id);
+        Password Update(Password password);
     }
 }

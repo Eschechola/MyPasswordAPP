@@ -92,6 +92,64 @@ namespace MyPasswordAPI.Application.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("update")]
+        public IActionResult Update([FromBody]PasswordDTO passwordDTO)
+        {
+            try
+            {
+                var password = _mapper.Map<Password>(passwordDTO);
+
+                var passwordValidator = new PasswordValidator();
+                var entityErrors = passwordValidator.Validate(password);
+
+                if (entityErrors.Errors.Count > 0)
+                    return BadRequest(new ResultViewModel("Corrija os campos inválidos e tente novamente.", false, entityErrors.Errors));
+
+                var passwordUpdated = _passwordService.Update(password);
+
+                return Ok(new ResultViewModel
+                {
+                    Message = "Senha atualizada com sucesso.",
+                    Success = true,
+                    Data = passwordUpdated
+                });
+            }
+            catch (Exception)
+            {
+                return InternalServerError;
+            }
+        }
+
+        [HttpGet]
+        [Route("get/{id}")]
+        public IActionResult GetPassword(int id = 0)
+        {
+            try
+            {
+                if (id == 0)
+                    return BadRequest(new ResultViewModel
+                    {
+                        Message = "Insira um ID de senha válido.",
+                        Success = false,
+                        Data = null
+                    });
+
+                var password = _passwordService.Get(id);
+
+                return Ok(new ResultViewModel
+                {
+                    Message = "Senhas encontradas com sucesso.",
+                    Success = true,
+                    Data = password
+                });
+            }
+            catch (Exception)
+            {
+                return InternalServerError;
+            }
+        }
+
         [HttpDelete]
         [Route("delete/{id}")]
         public IActionResult DeleteCustomer(int id = 0)

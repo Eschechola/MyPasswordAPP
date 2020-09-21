@@ -28,5 +28,15 @@ namespace MyPasswordAPI.Services.Services
         {
             return _passwordRepository.Insert(password);
         }
+
+        public Password Get(int id)
+        {
+            return _passwordRepository.Get(id);
+        }
+
+        public Password Update(Password password)
+        {
+            return _passwordRepository.Update(password);
+        }
     }
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:mypassword/blocs/bloc/customer.bloc.dart';
 import 'package:mypassword/blocs/bloc/navigation.bloc.dart';
 import 'package:mypassword/blocs/bloc/password.bloc.dart';
+import 'package:mypassword/models/entities/password.model.dart';
 import 'package:mypassword/pages/dashboard.page.dart';
+import 'package:mypassword/pages/managePassword.page.dart';
 import 'package:mypassword/styles/app.colors.dart';
 import 'package:mypassword/widgets/mypassword.alertDialog.dart';
 import 'package:mypassword/widgets/mypassword.toast.widget.dart';
@@ -92,8 +93,17 @@ class _MyPassowrdBottomSheetMenuState extends State<MyPassowrdBottomSheetMenu> {
     });
   }
 
+  void _pushUpdatePasswordPage(){
+    var password = new Password();
+    password.id = widget.passwordId;
+    password.title = widget.passwordName;
+    password.value = widget.passwordValue;
+
+    new NavigationBloc().pushTo(context, new ManagePasswordPage(password: password));
+  }
+
   void _updatePassword(){
-    
+    _pushUpdatePasswordPage();
   }
 
   @override

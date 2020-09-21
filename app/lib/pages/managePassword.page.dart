@@ -18,6 +18,10 @@ import 'package:mypassword/widgets/mypassword.navmenu.dart';
 import 'package:mypassword/widgets/mypassword.toast.widget.dart';
 
 class ManagePasswordPage extends StatefulWidget {
+  Password password;
+
+  ManagePasswordPage({this.password = null});
+
   @override
   _ManagePasswordPage createState() =>_ManagePasswordPage();
 }
@@ -29,20 +33,28 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
 
   bool isLoading = false;
 
-   final titleController = TextEditingController();
-   List<ErrorsValidation> titleErrors = new List<ErrorsValidation>();
+  final titleController = TextEditingController();
+  List<ErrorsValidation> titleErrors = new List<ErrorsValidation>();
 
   final valueController = TextEditingController();
   List<ErrorsValidation> valueErrors = new List<ErrorsValidation>();
 
   Future _initPage() async{
     await _getCustomerSession();
+
+    if(widget.password !=null)
+      _setPasswordData();
   }
 
   Future _getCustomerSession() async{
     await new CustomerBloc().getCustomerSession().then((value) => {
       _setCustomerSession(value)
     });
+  }
+
+  Future _setPasswordData(){
+    titleController.text = widget.password.title;
+    valueController.text = widget.password.value;
   }
 
   void _setCustomerSession(Customer customer){
@@ -96,7 +108,39 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
     valueErrors.clear();
   }
 
-  Future _insertPassword() async {
+  Future _insertPassword(Password password) async{
+    await new PasswordBloc().insertPassword(password).then((result) => {
+          //limpa os erros
+          _cleanAllErrors(),
+
+          MyPasswordToast.showToast(result.message, context),
+
+          if(result.success)
+            NavigationBloc().popAllAndReplace(context, new DashboardPage())
+          
+          else
+            _disableLoading()
+    });
+  }
+
+  Future _updatePassword(Password password) async {
+    password.id = widget.password.id;
+
+     await new PasswordBloc().updatePassword(password).then((result) => {
+          //limpa os erros
+          _cleanAllErrors(),
+
+          MyPasswordToast.showToast(result.message, context),
+
+          if(result.success)
+            NavigationBloc().popAllAndReplace(context, new DashboardPage())
+          
+          else
+            _disableLoading()
+    });
+  }
+
+  Future _save() async {
     try
     {
       _enableLoading();
@@ -126,18 +170,12 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
         MyPasswordToast.showToast(Settings.INVALID_INPUTS_MESSAGE, context);
       }
       else{
-        await new PasswordBloc().insertPassword(password).then((result) => {
-          //limpa os erros
-          _cleanAllErrors(),
 
-          MyPasswordToast.showToast(result.message, context),
+        if(widget.password != null)
+          await _updatePassword(password);
 
-          if(result.success)
-            NavigationBloc().popAllAndReplace(context, new DashboardPage())
-          
-          else
-            _disableLoading()
-        });
+        else
+          await _insertPassword(password);
       }
     }
     catch(ex)
@@ -235,7 +273,7 @@ class _ManagePasswordPage extends State<ManagePasswordPage> {
               ),
 
               MyPasswordButton(
-                function: _insertPassword,
+                function: _save,
                 inverseButton: false,
                 text: "Salvar",
               )

@@ -10,8 +10,33 @@ class PasswordService extends BaseService {
     _client = getHttpClient();
   }
 
+  Future<http.Response> updatePassword(Password password, String token) async{
+    var url = "${Settings.API_URL}/password/update";
+    var body = password.toJson();
+
+    final response = await _client.put(
+        url,
+        headers: getDefaultHeadersWithToken(token),
+        body: body
+    );
+
+    return response;
+  }
+
+
   Future<http.Response> getAllPasswords(int id, String token) async{
     var url = "${Settings.API_URL}/password/get-all/${id}";
+
+    final response = await _client.get(
+        url,
+        headers: getDefaultHeadersWithToken(token)
+    );
+
+    return response;
+  }
+
+  Future<http.Response> getPassword(int id, String token) async{
+    var url = "${Settings.API_URL}/password/get/${id}";
 
     final response = await _client.get(
         url,

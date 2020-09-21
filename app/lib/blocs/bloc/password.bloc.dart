@@ -14,12 +14,45 @@ class PasswordBloc extends BaseBloc{
     _customer = await getCustomerSession();
   }
 
-  Future<ResponseModel> getAllPasswords(int id) async{
+  Future<ResponseModel> getAllPasswords(int idCustomer) async{
     try{
       dynamic apiResponse;
       await _getCustomer();
 
-      await new PasswordService().getAllPasswords(id, _customer.token).then((response) =>{
+      await new PasswordService().getAllPasswords(idCustomer, _customer.token).then((response) =>{
+        apiResponse = json.decode(response.body),
+      });
+
+      return await super.valitadeResponse(apiResponse);
+    }
+    catch(Exception){
+      return new ResponseModel(message: Settings.ERROR_API_MESSAGE, success: false, data: null);
+    }
+  }
+
+  Future<ResponseModel> updatePassword(Password password) async{
+    try{
+      dynamic apiResponse;
+      await _getCustomer();
+
+      await new PasswordService().updatePassword(password, _customer.token).then((response) =>{
+        apiResponse = json.decode(response.body),
+      });
+
+      return await super.valitadeResponse(apiResponse);
+    }
+    catch(Exception){
+      return new ResponseModel(message: Settings.ERROR_API_MESSAGE, success: false, data: null);
+    }
+  }
+
+
+  Future<ResponseModel> getPasswords(int idPassword) async{
+    try{
+      dynamic apiResponse;
+      await _getCustomer();
+
+      await new PasswordService().getPassword(idPassword, _customer.token).then((response) =>{
         apiResponse = json.decode(response.body),
       });
 
